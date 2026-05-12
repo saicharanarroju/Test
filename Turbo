@@ -1,0 +1,23 @@
+def queueRequests(target, wordlists):
+    engine = RequestEngine(endpoint=target.endpoint,
+                          concurrentConnections=5,
+                          requestsPerConnection=10,
+                          pipeline=False,
+                          engine=Engine.THREADED)
+    
+    for i in range(1, 101):
+        # Zero-pad to match format: 01, 02 ... 09, 10 ... 100
+        suffix = str(i).zfill(2)
+        engine.queue(target.req, suffix, learn=0)
+
+
+def handleResponse(req, interesting):
+    # Flag non-200 responses or rate limit indicators
+    if req.status == 429:
+        table.add(req)
+    elif req.status != 200:
+        table.add(req)
+    elif '429' in req.response:
+        table.add(req)
+    else:
+        table.add(req)
